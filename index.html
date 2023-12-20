@@ -8,8 +8,57 @@
     <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
     <link rel='stylesheet' type='text/css' href='style.css'>
     <script src='main.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+    <script type="module">
+        // import sha256 from 'crypto-js/sha256';
+
+        function pay(){
+            const merchantCode = "D10904";
+            const apiKey = "b270b08d2634586d3dfb981593852f7c";
+            const date = new Date();
+            const timestamp = date.getTime();
+            const signatureText = `${merchantCode}${timestamp}${apiKey}`;
+            const signature = CryptoJS.SHA256(signatureText).toString();
+            // console.log(signatureText)
+            // console.log(signature)
+
+            const paymentAmount = 10000;
+            const productDetails = "Demo Product";
+            const email = "your@email.com";
+            const callbackUrl = "example.com/callback";
+            const returnUrl = "example.com/return";
+
+            const body = {
+                paymentAmount,
+                productDetails,
+                email,
+                callbackUrl,
+                returnUrl,
+                merchantOrderId: timestamp
+            }
+
+            const url = 'https://api-sandbox.duitku.com/api/merchant/createInvoice';
+            const options = {
+                method: 'POST',
+                headers: {
+                    'x-duitku-signature': `${signature}`,
+                    'x-duitku-timestamp': `${timestamp}`,
+                    'x-duitku-merchantcode': `${merchantCode}`
+                },
+                body: JSON.stringify(body)
+            };
+
+            fetch(url, options)
+                .then((response) => response.text())
+                .then((result) => console.log(result))
+                .catch(error => console.log(error))
+        }
+
+        window.pay = pay
+    </script>
 </head>
 <body>
     <h1>It's under construction not</h1>
+    <input type="button" value="pay" onclick="pay()">
 </body>
 </html>
